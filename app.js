@@ -12,7 +12,7 @@ import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access
 
 const app = express();
 //Puerto
-const port = 8002;
+const port = 8004;
 
 //Server
 const httpServer = app.listen(port, () => {
