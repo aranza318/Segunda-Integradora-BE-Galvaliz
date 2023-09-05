@@ -1,6 +1,7 @@
 import { userModel } from "./models/user.model.js";
 
 class UserManager {
+    //Agrega un nuevo usuario
     async addUser(user) {
         try {
             await userModel.create(user)
@@ -11,7 +12,7 @@ class UserManager {
             return false;
         }
     }
-
+    //Login
     async login(user, pass, req) {
         try {
             const userLogged =  (await userModel.findOne({ email: user, password: pass })) || null;
@@ -50,7 +51,7 @@ class UserManager {
             return false;
         }
     }
-
+    //Consigue el usuario por su email
     async getUserByEmail(user) {
         try {
             const userRegisteredBefore= await userModel.findOne([{email:user}]) || null;
@@ -66,38 +67,8 @@ class UserManager {
       
     }
     
-    async getUserByID(id) {
-        try {
-            const userID= await userModel.findOne([{_id:id}]) || null;
-             if(userID){
-                console.log(userID);
-                return user
-             }
-            
-            return true;
-        } catch (error) {
-            return false;
-        }
-      
-    }
-    logoutUser = async (req) => {
-        try {
-            req.session.destroy();
-            return { status: "success", message: "Sesión cerrada" };
-        } catch (error) {
-            console.log(error);
-            return { status: "error", error: "Error interno del servidor" };
-        }
-    };
+   
     
-    findUserById = async (idRef) => {
-        try {
-            const user = await userModel.findById(idRef);
-            return user? user : {};
-        } catch(error) {
-            console.log(error);
-        }
-    }
 };
     
 

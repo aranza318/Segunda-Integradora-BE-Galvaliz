@@ -4,6 +4,7 @@ import userManager from "../dao/userManager.js";
 const router = express.Router();
 const UM = new userManager();
 
+//Login
 router.get("/login", async(req,res)=>{
     console.log(`req.query: ${JSON.stringify(req.query)}`);
     let {user, pass} = req.query;
@@ -18,6 +19,7 @@ router.get("/login", async(req,res)=>{
     console.log(`res.status: ${res.statusCode}`);
 })
 
+//Registro
 router.post("/register", async(req, res)=>{
     const userOnBD = await UM.getUserByEmail(req.params.email)
      if(userOnBD){
@@ -33,6 +35,7 @@ router.post("/register", async(req, res)=>{
     }
 });
 
+//Logout
 router.post("/logout", async (req, res) => {
     req.session.destroy(err => {
         if(err) {
