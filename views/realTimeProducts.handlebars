@@ -3,10 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/src/public/css/style.css">
+  <link rel="stylesheet" href="../src/public/css/style.css">
   <title>Productos en tiempo real</title>
 </head>
 <body>
+   <div class="row-md-4 d-flex align-items-center justify-content-center">
+                 <ul class="nav justify-content-end">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/login">Login</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link text-white" href="/register">Registrarse</a>
+                     </li>
+                      <li class="nav-item">
+                        <a class="nav-link text-white" href="/realtimeProducts">Formulario</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link text-white" href="/chat">Chat</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link text-white" href="/products">Terapias</a>
+                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/profile">Tu perfil</a>
+                     </li>
+                 </ul>
+            </div>
   <div class="container">
    <form id="formProduct">
     <h2>Realtime Products</h2>
@@ -23,16 +45,13 @@
     <button class="botons" type="button" id="delete-btn">Eliminar</button>
  
 </form>
-    <ul id="productList" class="realtime-products">
-      {{#each products}}
-      <li id="product-{{this._id}}" class="product">
-        <img src={{this.thumbnail}} alt={{this.title}}>
-        <span>Producto: {{this.title}} - Stock: {{this.stock}} - Descripción: {{this.description}}</span>
-      </li>
-      {{/each}}
-    </ul>
+   <div class="container-fluid">
+    <div class="row">
+<article id="list-products"></article>
+    </div>
+</div>
   </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/src/public/realTimeProducts.js"></script>
+<script src="../src/public/realTimeProducts.js"></script>
 </html>

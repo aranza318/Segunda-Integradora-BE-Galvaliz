@@ -25,7 +25,15 @@
     align-items: center;
     
   }
-
+  .color1{
+    text-align: center;
+    color: white;
+  }
+  .color2{
+    text-align: center;
+    color: white;
+    font-size: medium;
+  }
   .container {
     position: relative;
   }

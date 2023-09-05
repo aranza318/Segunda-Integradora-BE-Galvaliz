@@ -3,27 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/src/public/css/style.css">
+  <link rel="stylesheet" href="../src/public/css/style.css">
   <title>Document</title>
 </head>
 <body>
+     <div class="row-md-4 d-flex align-items-center justify-content-center">
+                 <ul class="nav justify-content-end">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/login">Login</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link text-white" href="/register">Registrarse</a>
+                     </li>
+                      <li class="nav-item">
+                        <a class="nav-link text-white" href="/realtimeProducts">Formulario</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link text-white" href="/chat">Chat</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link text-white" href="/products">Terapias</a>
+                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/profile">Tu perfil</a>
+                     </li>
+                 </ul>
+            </div>
  <div class="container">
     <div class="row">
+        <div class="user">
+            <p class="color1">Bienvenido, {{user.first_name}} {{user.last_name}}!</p>
+        </div>
         {{#each products.payload}}
-            <div class="col-md-4">
-                <div class="card border-0 mb-3">
-                    <div class="imgBx">
-                    <a href="/products/{{this._id}}" class="text-decoration-none">
-                        <img src="{{this.thumbnail}}" class="img-fluid" alt="{{this.title}}">
-                    </a></div>
-                    <div class="card-body text-center">
-                        <div class="contentBx">
-                        <p class="card-text text-dark">{{this.title}}<br><span class="text-danger">${{this.price}}</span></p>
-                        <p><button class="btn btn-dark" onclick="agregarProductoAlCarrito('{{this._id}}')">Agregar (+)</button></p>
-                    </div>
-                    </div>
-                </div>
+             <article class="container col-md-4">
+    <div class="card" id="id-card">
+        <div class="imgBx">
+            <img src={{thumbnail}} width="150"/>
+        </div>
+        <div class="contentBx">
+            <h2>{{title}}</h2>
+            <div class="color">
+                <h3>${{price}}</h3>
             </div>
+        <a href="/products/{{this._id}}"><button class="botons" type="button" id="addCart-btn">Comprar ahora</button> </a>
+        </div>
+    </div>
+</article>
         {{/each}}
     </div>
     <div class="row my-5">
@@ -59,5 +84,5 @@
     </div>
 </div>
 </body>
-<script src="/src/public/cart.js"></script>
+<script src="../src/public/cart.js"></script>
 </html>

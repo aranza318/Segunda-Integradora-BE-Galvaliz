@@ -65,3 +65,11 @@ document.getElementById("delete-btn").addEventListener("click", function () {
     deleteidinput.value = "";
   });
 
+const eliminarProducto = () =>{
+    const idProd = document.getElementById("id-prod").value;
+    socketClient.emit("eliminarProducto", idProd);
+}
+
+const btnEliminarProd = document.getElementById("btnEliminarProducto");
+btnEliminarProd.onclick = eliminarProducto();
+
