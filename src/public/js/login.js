@@ -1,30 +1,19 @@
-const loginUser = async () => {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
+const loginForm = document.querySelector("#loginForm")
 
-  
-    try {
-        const response = await fetch(`/api/sessions/login?user=${email}&pass=${password}`, {
-            credentials: 'include'
-        });
-        
-        if (!response.ok) {
-            console.log(`Error en la respuesta: ${response.status}`);
-            return;
+loginForm.addEventListener('submit', event => {
+    event.preventDefault()
+    const data = new FormData(loginForm)
+    const obj = {}
+    data.forEach((value, key) => obj[key] = value)
+    fetch('/api/sessions/login', {
+        method: 'POST',
+        body: JSON.stringify(obj),
+        headers: {
+            'Content-Type': 'application/json'
         }
-        
-        const data = await response.json();
-        console.log(data);
-        
-        if (data.status === "OK") {
-            console.log("inicio de sesión exitosa");
-            window.location.href = "/products";
-        } else {
-            console.log('Fallo al iniciar sesión');
+    }).then(result => {
+        if (result.status === 201) {
+            window.location.replace('/profile')
         }
-    } catch (error) {
-        console.log('Error en la petición', error);
-    }
-}
-
-document.getElementById("btnLogIn").onclick = loginUser;
+    })
+})

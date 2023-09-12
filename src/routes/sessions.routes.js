@@ -1,39 +1,82 @@
 import express  from "express";
 import userManager from "../dao/userManager.js";
+import { createHash } from "../midsIngreso/bcrypt.js";
+import passport from "passport";
+import usersModel from "../dao/models/user.model.js";
 
 const router = express.Router();
 const UM = new userManager();
 
 //Login
-router.get("/login", async(req,res)=>{
-    console.log(`req.query: ${JSON.stringify(req.query)}`);
-    let {user, pass} = req.query;
-    const userLogged = await UM.login(user, pass, req); 
+router.post("/login", passport.authenticate("local"), async(req,res) => {
+    if(!req.user) return res.status(400).send({status: "error", error:"Invalid"})
 
-    if (userLogged) {
-        res.send({status:"OK", message:userLogged});
-    } else {
-        console.log('Fallo al loguear en el servidor');
-        res.status(401).send({status:"Error", message:"No se pudo loguear el Usuario!"});
-    }
-    console.log(`res.status: ${res.statusCode}`);
+    const email = req.user.email
+    let user = await usersModel.findOne({email})
+    if(user){req.session.user = {
+        name: `${user.first_name} ${user.last_name}`,
+        email: req.user.email,
+        age: req.user.age,
+        rol: req.user.rol
+    }}
+    if(user === "adminCoder@coder.com"){req.session.user = {
+        rol: "admin"
+    } 
+}
+    res.sendStatus(201)
 })
 
 //Registro
-router.post("/register", async(req, res)=>{
-    const userOnBD = await UM.getUserByEmail(req.params.email)
-     if(userOnBD){
-        console.log("Mail ya esta registrado, usar otro");
-        res.status(400).send({status:"error", message: "Email ya existente en base de datos"})
-     } else {
-    const userRegistered = await UM.addUser(req.body)
-    if(userRegistered){
-        res.send({status:"OK", message:userRegistered});
-    }else {
-        res.status(400).send({status:"error", message: "No se pudo registrar al usuario"})
+router.post("/register", async (req,res)=>{
+    try {
+        const {
+            first_name,
+            last_name,
+            email,
+            age,
+            password
+        } = req.body;
+        const existe = await UM.getUserByEmail({
+            email
+        })
+        if (existe) {
+            return res.status(400).send({
+                status: "error",
+                error: "Este mail ya esta registrado"
+            })
+        }
+        const user = {
+            first_name,
+            last_name,
+            email,
+            age,
+            password: createHash(password),
+        }
+
+        let result = await UM.addUser(user)
+        console.log(result)
+
+        req.session.user = {
+            name: `${user.first_name} ${user.last_name}`,
+            email: user.email,
+            age: user.age,
+            rol: "usuario"
+        }
+
+        console.log(req.session.user)
+        
+        res.redirect("/login");
+        res.status(201).send({
+            status: "success",
+            message: "Usuario Registrado!"
+        })
+
+
+    } catch (error) {
+        return(error)
     }
-    }
-});
+   
+})
 
 //Logout
 router.post("/logout", async (req, res) => {
@@ -43,6 +86,28 @@ router.post("/logout", async (req, res) => {
         }
           res.redirect('/login');
       });
+});
+
+//Restore
+router.get("/restore", async (req, res) => {
+    let {user, pass} = req.query;
+    pass = createHash(pass);
+    const passwordRestored = await UM.restorePassword(user, pass);
+
+    if (passwordRestored) {
+        res.send({status:"OK", message:"La contraseña se ha actualizado correctamente!"});
+    } else {
+        res.status(401).send({status:"Error", message:"No se pudo actualizar la contraseña!"});
+    }    
+});
+
+//GitHub
+router.get("/github", passport.authenticate("github", {scope:["user:email"]}), async (req, res) => {});
+
+router.get("/githubcallback", passport.authenticate("github", {failureRedirect:"/login"}), async (req, res) => {
+    req.session.user = req.user;
+    req.session.loggedIn = true;
+    res.redirect("/profile");
 });
 
 export default router;

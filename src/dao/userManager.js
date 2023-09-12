@@ -1,10 +1,14 @@
-import { userModel } from "./models/user.model.js";
+import usersModel from "./models/user.model.js";
 
 class UserManager {
     //Agrega un nuevo usuario
     async addUser(user) {
         try {
-            await userModel.create(user)
+            if(user.email == "adminCoder@coder"){
+                ures.rol= "admin"
+            }
+            
+            await usersModel.create(user)
             console.log("User added!");
     
             return true;
@@ -13,13 +17,13 @@ class UserManager {
         }
     }
     //Login
-    async login(user, pass, req) {
+    async login(user) {
         try {
-            const userLogged =  (await userModel.findOne({ email: user, password: pass })) || null;
+            const userLogged =  (await usersModel.findOne({ email: user, password: pass })) || null;
             
             if (userLogged) {
                 if (userLogged) {
-        const role =
+        const rol =
           userLogged.email === "adminCoder@coder.com" ? "admin" : "usuario";
 
         req.session.user = {
@@ -27,7 +31,7 @@ class UserManager {
           email: userLogged.email,
           first_name: userLogged.first_name,
           last_name: userLogged.last_name,
-          role: role,
+          rol: rol,
         };
 
         console.log(
@@ -54,7 +58,7 @@ class UserManager {
     //Consigue el usuario por su email
     async getUserByEmail(user) {
         try {
-            const userRegisteredBefore= await userModel.findOne([{email:user}]) || null;
+            const userRegisteredBefore= await usersModel.findOne([{email:user}]) || null;
              if(userRegisteredBefore){
                 console.log("Mail registrado anteriormente");
                 return user
@@ -66,9 +70,34 @@ class UserManager {
         }
       
     }
+    //Restore Password
+    async restorePassword(user, pass) {
+        try {
+            const userLogged = await usersModel.updateOne({email:user}, {password:pass}) || null;
+            
+            if (userLogged) {
+                console.log("Password Restored!");
+                return userLogged;
+            }
+
+            return false;
+        } catch (error) {
+            return false;
+        }
+    }
     
-   
-    
+    //Obtiene el campo solicitado
+    async obtenerSegunCampo({campo,valor}) {
+        const criterio = {}
+        criterio[campo] = valor
+        const buscado = await usersModel.findOne(criterio).lean()
+        if (!buscado) {
+            throw new Error("no encontrado")
+        } else {
+            return buscado
+        }
+
+    }
 };
     
 

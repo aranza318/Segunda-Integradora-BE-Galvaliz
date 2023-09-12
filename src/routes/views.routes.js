@@ -6,7 +6,6 @@ const router = express.Router();
 const PM = new ProductManager();
 const CM = new CartManager()
 
-//Control de acceso
 const checkSession = (req, res, next) => {
   console.log(
     "Verificando req.session.user en checkSession:",
@@ -34,14 +33,14 @@ const checkAlreadyLoggedIn = (req, res, next) => {
   }
 };
 
-//Acceso a home
+//Acceso a home que ahora es login ya que no puede ver los productos quien no este registrado
 router.get("/", async (req, res) => {
   const products = await PM.getProducts(req.query);
   res.render("login");
 });
 
 //Acceso a products
-router.get("/products", checkSession, async (req, res) => {
+router.get("/products", async (req, res) => {
   const products = await PM.getProducts(req.query);
   const user = req.session.user;
   res.render("products", {products, user});
@@ -51,24 +50,18 @@ router.get("/products", checkSession, async (req, res) => {
 router.get("/products/:pid", async (req, res) => {
   const pid = req.params.pid;
   const product = await PM.getProductById(pid);
-  if (product) {
-    res.render("productDetail", { product });
-  } else {
-    res.status(404).send({ status: "error", message: "Product not found." });
-  }
+
+  res.render("productDetail", { product });
+
 });
 
 //Acceso a cart por su ID
-router.get("/carts/:cid", async (req, res) => {
+router.get("/cart", async (req, res) => {
   const cid = req.params.cid;
   const cart = await CM.getCart(cid);
 
-  if (cart) {
-    console.log(JSON.stringify(cart, null, 4));
-    res.render("cart", { products: cart.products });
-  } else {
-    res.status(400).send({ status: "error", message: "Error! No se encuentra el ID de Carrito!"});
-  }
+  res.render("cart", { products: cart.products });
+ 
 });
 
 //Acceso al formulario
@@ -82,18 +75,26 @@ router.get("/chat", (req, res) => {
 });
 
 //Acceso al login
-router.get("/login",checkAlreadyLoggedIn, (req, res) => {
+router.get("/login",checkAlreadyLoggedIn, async (req, res) => {
   res.render("login");
 });
 
 //Acceso al registro
-router.get("/register",checkAlreadyLoggedIn, (req, res) => {
+router.get("/register",checkAlreadyLoggedIn, async (req, res) => {
   res.render("register");
 });
 
 //Acceso al profile
-router.get("/profile", checkSession, (req, res) => {
+router.get("/profile",checkSession, (req, res) => {
   const userData = req.session.user;
   res.render("profile", {user:userData});
 });
+
+//Acceso a restore de pass
+router.get("/restore", checkSession, (req, res) => {
+  res.render("restore");
+});
+
+
+
 export default router;

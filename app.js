@@ -12,17 +12,24 @@ import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import morgan from "morgan";
-
+import { initializePassport, passportSession } from "./src/midsIngreso/passport.js"
+import initializeGitHubPassport from "./src/midsIngreso/github.js";
+import passport from "passport";
+import cookieParser from "cookie-parser";
+import { errorHandler } from "./src/errors/errorHandler.js";
+import { COOKIE_SECRET, MONGODB_CNX_STR, PORT } from "./src/config/configs.js"
 
 
 const app = express();
-//Puerto
-const port = 8004;
+
+//Mongo connect
+const connection = mongoose.connect(MONGODB_CNX_STR,({
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}))
 
 //Server
-const httpServer = app.listen(port, () => {
-  console.log("Servidor escuchando en puerto " + port);
-});
+const httpServer = app.listen(PORT, () => {console.log(`conectado a ${PORT}`)})
 export const socketServer = new Server(httpServer);
 
 //Socket Server
@@ -39,17 +46,21 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 app.use(express.static(__dirname));
 
+app.use(cookieParser(COOKIE_SECRET));
+
 app.use(session({
   store: new MongoStore({
-    mongoUrl: "mongodb+srv://agalvaliz318:Imagine318@aranza.g9tojob.mongodb.net/ecommerce?retryWrites=true&w=majority",
-    ttl: 3600
-}),
-  secret: 'MyS3cr3t',
+      mongoUrl: MONGODB_CNX_STR,
+      ttl: 3600
+  }),
+  secret: "secretito",
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } 
-}));
-app.use(express.static(__dirname+"/src/public"))
+  saveUninitialized: false
+}))
+initializeGitHubPassport();    app.use(initializePassport, passportSession);
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static(__dirname+"/src/public"));
 app.use("/images", express.static(__dirname+ "/src/public/images"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -58,6 +69,7 @@ app.use("/api/products/", productsRouter);
 app.use("/api/carts/", cartsRouter);
 app.use("/api/sessions/", sessionsRouter);
 app.use("/", viewsRouter);
+app.use(errorHandler);
 
 //Managers
 import ProductManager from "./src/dao/ProductManager.js";
@@ -69,32 +81,6 @@ const MM = new MessagesManager();
 import CartManager from "./src/dao/cartManager.js";
 const CM = new CartManager();
 
-import UserManager from "./src/dao/userManager.js";
-const UM = new UserManager()
-
-app.get("/session", async(req, res) => {
-
-  if (req.session.contador) {
-      req.session.contador++;
-      res.send("Visitaste el Sitio Web: " + req.session.contador + " veces!");
-  } else {
-      req.session.contador = 1;
-      res.send("Welcome");
-  }
-})
-
-//Mongo connect
-mongoose.connect(
-  "mongodb+srv://agalvaliz318:Imagine318@aranza.g9tojob.mongodb.net/ecommerce?retryWrites=true&w=majority"
-);
-
-mongoose.connection.on("connected", () => {
-  console.log("Conectado a MongoDB");
-});
-
-mongoose.connection.on("error", (err) => {
-  console.error("Error conectando a MongoDB:", err);
-});
 
 //Sockets on 
 socketServer.on("connection", async (socket) => {
