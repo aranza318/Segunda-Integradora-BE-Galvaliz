@@ -4,6 +4,7 @@ import CartManager from "../dao/cartManager.js";
 const cartsRouter = Router();
 const CM = new CartManager();
 
+
 //Postea el nuevo carrito
 cartsRouter.post("/", async (req, res) => {
   const newCart = await CM.newCart();
