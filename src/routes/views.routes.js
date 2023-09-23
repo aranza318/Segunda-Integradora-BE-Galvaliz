@@ -95,6 +95,13 @@ router.get("/restore", checkSession, (req, res) => {
   res.render("restore");
 });
 
+//Fallo de ingreso
+router.get("/faillogin", (req, res) =>{
+  res.status(401).json({
+      status:"error",
+      message: "Error en el ingreso al sitio con ese mail y contraseña"
+  });
+})
 
 
 export default router;

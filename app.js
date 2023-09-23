@@ -12,12 +12,12 @@ import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import morgan from "morgan";
-import { initializePassport, passportSession } from "./src/midsIngreso/passport.js"
+import initializePassport from "./src/midsIngreso/passport.js"
 import initializeGitHubPassport from "./src/midsIngreso/github.js";
 import passport from "passport";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./src/errors/errorHandler.js";
-import { COOKIE_SECRET, MONGODB_CNX_STR, PORT } from "./src/config/configs.js"
+import { MONGODB_CNX_STR, PORT } from "./src/config/configs.js"
 
 
 const app = express();
@@ -46,18 +46,19 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 app.use(express.static(__dirname));
 
-app.use(cookieParser(COOKIE_SECRET));
+app.use(cookieParser());
 
 app.use(session({
   store: new MongoStore({
       mongoUrl: MONGODB_CNX_STR,
-      ttl: 3600
+      collectionName:"sessions"
   }),
   secret: "secretito",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {secure:false}
 }))
-initializeGitHubPassport();    app.use(initializePassport, passportSession);
+initializeGitHubPassport();    initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(__dirname+"/src/public"));

@@ -88,13 +88,13 @@ class ProductManager {
       });
       let status = products ? "success" : "error";
       let prevLink = products.hasPrevPage
-        ? "http://localhost:8002/products?limit=" +
+        ? "http://localhost:8080/products?limit=" +
           limit +
           "&page=" +
           products.prevPage
         : null;
       let nextLink = products.hasNextPage
-        ? "http://localhost:8002/products?limit=" +
+        ? "http://localhost:8080/products?limit=" +
           limit +
           "&page=" +
           products.nextPage
