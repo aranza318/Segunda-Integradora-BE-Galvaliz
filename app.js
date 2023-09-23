@@ -16,7 +16,7 @@ import initializePassport from "./src/midsIngreso/passport.js"
 import initializeGitHubPassport from "./src/midsIngreso/github.js";
 import passport from "passport";
 import cookieParser from "cookie-parser";
-import { errorHandler } from "./src/errors/errorHandler.js";
+
 import { MONGODB_CNX_STR, PORT } from "./src/config/configs.js"
 
 
@@ -70,7 +70,7 @@ app.use("/api/products/", productsRouter);
 app.use("/api/carts/", cartsRouter);
 app.use("/api/sessions/", sessionsRouter);
 app.use("/", viewsRouter);
-app.use(errorHandler);
+
 
 //Managers
 import ProductManager from "./src/dao/ProductManager.js";
